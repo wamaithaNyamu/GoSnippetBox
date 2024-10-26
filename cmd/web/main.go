@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+    "GoSnippetBox/internal/models"
     _ "github.com/go-sql-driver/mysql" // New import
 )
 
@@ -15,6 +16,7 @@ import (
 type application struct {
     errorLog *log.Logger
     infoLog  *log.Logger
+    snippets *models.SnippetModel
 }
 
 
@@ -60,6 +62,7 @@ func main() {
     app := &application{
         errorLog: errorLog,
         infoLog:  infoLog,
+        snippets: &models.SnippetModel{DB: db},
     }
 // Initialize a new http.Server struct. We set the Addr and Handler fields so
     // that the server uses the same network address and routes as before, and set
