@@ -8,4 +8,5 @@ import "GoSnippetBox/internal/models"
 // to it as the build progresses.
 type templateData struct {
     Snippet *models.Snippet
+	Snippets []*models.Snippet
 }

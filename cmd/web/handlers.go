@@ -9,47 +9,42 @@ import (
 	"GoSnippetBox/internal/models"
 )
 
-// Change the signature of the home handler so it is defined as a method against
-// *application.
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
     if r.URL.Path != "/" {
         app.notFound(w)
         return
     }
 
-	snippets, err := app.snippets.Latest()
+    snippets, err := app.snippets.Latest()
     if err != nil {
         app.serverError(w, err)
         return
     }
 
-    for _, snippet := range snippets {
-        fmt.Fprintf(w, "%+v\n", snippet)
+    files := []string{
+        "./ui/html/base.tmpl",
+        "./ui/html/partials/nav.tmpl",
+        "./ui/html/pages/home.tmpl",
     }
 
-    // files := []string{
-    //     "./ui/html/base.tmpl",
-    //     "./ui/html/partials/nav.tmpl",
-    //     "./ui/html/pages/home.tmpl",
-    // }
+    ts, err := template.ParseFiles(files...)
+    if err != nil {
+        app.serverError(w, err)
+        return
+    }
 
-    // ts, err := template.ParseFiles(files...)
-    // if err != nil {
-    //     // Because the home handler function is now a method against application
-    //     // it can access its fields, including the error logger. We'll write the log
-    //     // message to this instead of the standard logger.
-    //     app.serverError(w, err)
-    //     http.Error(w, "Internal Server Error", 500)
-    //     return
-    // }
+    // Create an instance of a templateData struct holding the slice of
+    // snippets.
+    data := &templateData{
+        Snippets: snippets,
+    }
 
-    // err = ts.ExecuteTemplate(w, "base", nil)
-    // if err != nil {
-    //     // Also update the code here to use the error logger from the application
-    //     // struct.
-    //     app.serverError(w,err)
-    //     http.Error(w, "Internal Server Error", 500)
-    // }
+    // Pass in the templateData struct when executing the template.
+    err = ts.ExecuteTemplate(w, "base", data)
+    if err != nil {
+        app.serverError(w, err)
+    }
 }
 
 
