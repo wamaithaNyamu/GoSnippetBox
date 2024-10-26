@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
+//	"html/template"
 	"net/http"
 	"strconv"
 	"GoSnippetBox/internal/models"
@@ -17,29 +17,39 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    files := []string{
-        "./ui/html/base.tmpl",
-        "./ui/html/partials/nav.tmpl",
-        "./ui/html/pages/home.tmpl",
-    }
-
-    ts, err := template.ParseFiles(files...)
+	snippets, err := app.snippets.Latest()
     if err != nil {
-        // Because the home handler function is now a method against application
-        // it can access its fields, including the error logger. We'll write the log
-        // message to this instead of the standard logger.
         app.serverError(w, err)
-        http.Error(w, "Internal Server Error", 500)
         return
     }
 
-    err = ts.ExecuteTemplate(w, "base", nil)
-    if err != nil {
-        // Also update the code here to use the error logger from the application
-        // struct.
-        app.serverError(w,err)
-        http.Error(w, "Internal Server Error", 500)
+    for _, snippet := range snippets {
+        fmt.Fprintf(w, "%+v\n", snippet)
     }
+
+    // files := []string{
+    //     "./ui/html/base.tmpl",
+    //     "./ui/html/partials/nav.tmpl",
+    //     "./ui/html/pages/home.tmpl",
+    // }
+
+    // ts, err := template.ParseFiles(files...)
+    // if err != nil {
+    //     // Because the home handler function is now a method against application
+    //     // it can access its fields, including the error logger. We'll write the log
+    //     // message to this instead of the standard logger.
+    //     app.serverError(w, err)
+    //     http.Error(w, "Internal Server Error", 500)
+    //     return
+    // }
+
+    // err = ts.ExecuteTemplate(w, "base", nil)
+    // if err != nil {
+    //     // Also update the code here to use the error logger from the application
+    //     // struct.
+    //     app.serverError(w,err)
+    //     http.Error(w, "Internal Server Error", 500)
+    // }
 }
 
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
