@@ -1,12 +1,13 @@
 package main
 
 import (
+	"GoSnippetBox/internal/models"
 	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
-	"GoSnippetBox/internal/models"
-	"github.com/julienschmidt/httprouter" 
+
+	"github.com/julienschmidt/httprouter"
 )
 
 
@@ -69,10 +70,9 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
     app.render(w, http.StatusOK, "create.tmpl", data)
 }
 
-
-
-// Rename this handler to snippetCreatePost.
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
+	// Limit the request body size to 4096 bytes
+	r.Body = http.MaxBytesReader(w, r.Body, 4096)
   // First we call r.ParseForm() which adds any data in POST request bodies
     // to the r.PostForm map. This also works in the same way for PUT and PATCH
     // requests. If there are any errors, we use our app.ClientError() helper to 
@@ -87,6 +87,12 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
     // from the r.PostForm map.
     title := r.PostForm.Get("title")
     content := r.PostForm.Get("content")
+	 // Retrieve the roles selected by the user.
+	 roles := r.PostForm["roles"]
+
+	 // Print the selected roles to the console.
+	 fmt.Println("Selected roles:", roles)
+ 
 
     // The r.PostForm.Get() method always returns the form data as a *string*.
     // However, we're expecting our expires value to be a number, and want to
