@@ -60,3 +60,29 @@ Or if you’ve removed all references to the package in your code, you could run
 ```sh
 go mod tidy -v
 ```
+
+Controlling loop behavior
+
+Within a {{range}} action you can use the {{break}} command to end the loop early, and {{continue}} to immediately start the next loop iteration.
+
+```sh
+{{range .Foo}}
+    // Skip this iteration if the .ID value equals 99.
+    {{if eq .ID 99}}
+        {{continue}}
+    {{end}}
+    // ...
+{{end}}
+
+```
+
+```sh
+{{range .Foo}}
+    // End the loop if the .ID value equals 99.
+    {{if eq .ID 99}}
+        {{break}}
+    {{end}}
+    // ...
+{{end}}
+
+```
