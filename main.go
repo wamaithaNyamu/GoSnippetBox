@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // define a home handler (same as controller) which writes a byte slice
@@ -19,16 +21,27 @@ func home(w http.ResponseWriter, r *http.Request){
 
 // Add a snippetView handler function.
 func snippetView(w http.ResponseWriter, r *http.Request) {
-    w.Write([]byte("Display a specific snippet..."))
+    // Extract the value of the id parameter from the query string and try to
+    // convert it to an integer using the strconv.Atoi() function. If it can't
+    // be converted to an integer, or the value is less than 1, we return a 404 page
+    // not found response.
+    id, err := strconv.Atoi(r.URL.Query().Get("id"))
+    if err != nil || id < 1 {
+        http.NotFound(w, r)
+        return
+    }
+
+    // Use the fmt.Fprintf() function to interpolate the id value with our response
+    // and write it to the http.ResponseWriter.
+    fmt.Fprintf(w, "Display a specific snippet with ID %d...", id)
 }
 
 // Add a snippetCreate handler function.
 func snippetCreate(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "POST"{
-		w.Header().Set("Allow", "POST")
-		w.WriteHeader(405)
-		w.Write([]byte("Method not allowed!"))
+	if r.Method != http.MethodPost{
+		w.Header().Set("Allow", http.MethodPost)
+        http.Error(w, "Method Not Allowed",  http.StatusMethodNotAllowed)
 		return
 	}
     w.Write([]byte("Create a new snippet..."))
