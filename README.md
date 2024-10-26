@@ -17,8 +17,14 @@ go run ./cmd/web -addr=$SNIPPETBOX_ADDR
 
 ```
 
-If you needed to get it directly in code:
+If you needed to get it directly in code (os has to be imported):
 
 ```go
 addr := os.Getenv("SNIPPETBOX_ADDR")
+```
+
+To redirect info and error logs. Note: Using the double arrow >> will append to an existing file, instead of truncating it when starting the application.
+
+```sh
+go run ./cmd/web >>/tmp/info.log 2>>/tmp/error.log
 ```
