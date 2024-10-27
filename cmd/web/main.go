@@ -118,6 +118,10 @@ func main() {
         // Call the new app.routes() method to get the servemux containing our routes.
         Handler: app.routes(),
         TLSConfig: tlsConfig,
+        // Add Idle, Read and Write timeouts to the server.
+        IdleTimeout:  time.Minute,
+        ReadTimeout:  5 * time.Second,
+        WriteTimeout: 10 * time.Second,
     }
     // Write messages using the two new loggers, instead of the standard logger.
     infoLog.Printf("Starting server on %s", *addr)
