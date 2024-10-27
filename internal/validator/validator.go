@@ -6,6 +6,7 @@ import (
 	"unicode/utf8"
 )
 
+
 // Use the regexp.MustCompile() function to parse a regular expression pattern
 // for sanity checking the format of an email address. This returns a pointer to
 // a 'compiled' regexp.Regexp type, or panics in the event of an error. Parsing
@@ -25,15 +26,23 @@ func Matches(value string, rx *regexp.Regexp) bool {
     return rx.MatchString(value)
 }
 
-// Define a new Validator type which contains a map of validation errors for our
-// form fields.
+// Add a new NonFieldErrors []string field to the struct, which we will use to 
+// hold any validation errors which are not related to a specific form field.
 type Validator struct {
-    FieldErrors map[string]string
+    NonFieldErrors []string
+    FieldErrors    map[string]string
 }
 
-// Valid() returns true if the FieldErrors map doesn't contain any entries.
+// Update the Valid() method to also check that the NonFieldErrors slice is
+// empty.
 func (v *Validator) Valid() bool {
-    return len(v.FieldErrors) == 0
+    return len(v.FieldErrors) == 0 && len(v.NonFieldErrors) == 0
+}
+
+// Create an AddNonFieldError() helper for adding error messages to the new
+// NonFieldErrors slice.
+func (v *Validator) AddNonFieldError(message string) {
+    v.NonFieldErrors = append(v.NonFieldErrors, message)
 }
 
 // AddFieldError() adds an error message to the FieldErrors map (so long as no
