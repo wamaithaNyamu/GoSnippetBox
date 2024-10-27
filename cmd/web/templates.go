@@ -18,6 +18,8 @@ type templateData struct {
 	Snippets []*models.Snippet
 	Form        any
 	Flash       string // Add a Flash field to the templateData struct.
+	IsAuthenticated bool // Add an IsAuthenticated field to the templateData struct.
+
 
 }
 
