@@ -1,17 +1,21 @@
 package main
 
 import (
+	"GoSnippetBox/internal/models"
 	"database/sql"
 	"flag"
+	"html/template"
 	"log"
 	"net/http"
-    "html/template" 
 	"os"
-    "GoSnippetBox/internal/models"
-    "github.com/go-playground/form/v4" 
-    _ "github.com/go-sql-driver/mysql" // New import
-)
+	"time"
 
+	"github.com/alexedwards/scs/mysqlstore" // New import
+	"github.com/alexedwards/scs/v2"         // New import
+
+	"github.com/go-playground/form/v4"
+	_ "github.com/go-sql-driver/mysql" // New import
+)
 
 // Add a templateCache field to the application struct.
 type application struct {
@@ -20,6 +24,7 @@ type application struct {
     snippets      *models.SnippetModel
     templateCache map[string]*template.Template
     formDecoder   *form.Decoder
+    sessionManager *scs.SessionManager
 }
 
 
@@ -38,7 +43,7 @@ func main() {
     // otherwise it will always contain the default value of ":4000". If any errors are
     // encountered during parsing the application will be terminated.
     flag.Parse()
- // Use log.New() to create a logger for writing information messages. This takes
+     // Use log.New() to create a logger for writing information messages. This takes
     // three parameters: the destination to write the logs to (os.Stdout), a string
     // prefix for message (INFO followed by a tab), and flags to indicate what
     // additional information to include (local date and time). Note that the flags
@@ -68,6 +73,13 @@ func main() {
 
     // Initialize a decoder instance...
     formDecoder := form.NewDecoder()
+// Use the scs.New() function to initialize a new session manager. Then we
+    // configure it to use our MySQL database as the session store, and set a
+    // lifetime of 12 hours (so that sessions automatically expire 12 hours
+    // after first being created).
+    sessionManager := scs.New()
+    sessionManager.Store = mysqlstore.New(db)
+    sessionManager.Lifetime = 12 * time.Hour
 
 
       // Initialize a new instance of our application struct, containing the
@@ -78,6 +90,7 @@ func main() {
         snippets: &models.SnippetModel{DB: db},
         templateCache: templateCache,
         formDecoder:   formDecoder,
+        sessionManager: sessionManager,
     }
 // Initialize a new http.Server struct. We set the Addr and Handler fields so
     // that the server uses the same network address and routes as before, and set
