@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 	"time"
-
+    "crypto/tls" 
 	"github.com/alexedwards/scs/mysqlstore" // New import
 	"github.com/alexedwards/scs/v2"         // New import
 
@@ -97,6 +97,17 @@ func main() {
         formDecoder:   formDecoder,
         sessionManager: sessionManager,
     }
+
+
+    // Initialize a tls.Config struct to hold the non-default TLS settings we
+    // want the server to use. In this case the only thing that we're changing
+    // is the curve preferences value, so that only elliptic curves with
+    // assembly implementations are used.
+    tlsConfig := &tls.Config{
+        CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+    }
+
+
 // Initialize a new http.Server struct. We set the Addr and Handler fields so
     // that the server uses the same network address and routes as before, and set
     // the ErrorLog field so that the server now uses the custom errorLog logger in
@@ -106,6 +117,7 @@ func main() {
         ErrorLog: errorLog,
         // Call the new app.routes() method to get the servemux containing our routes.
         Handler: app.routes(),
+        TLSConfig: tlsConfig,
     }
     // Write messages using the two new loggers, instead of the standard logger.
     infoLog.Printf("Starting server on %s", *addr)
